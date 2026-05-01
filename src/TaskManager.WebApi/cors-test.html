@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>CORS Test</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testLogin() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing...';
+
+            try {
+                const res = await fetch('http://localhost:5137/api/auth/login', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Origin': 'http://localhost:3000'  // ลอง origin อื่น
+                    },
+                    body: JSON.stringify({ 
+                        email: 'nes@gmail.com', 
+                        password: '1234' 
+                    })
+                });
+
+                const data = await res.json();
+                result.textContent = JSON.stringify({ 
+                    status: res.status, 
+                    ok: res.ok, 
+                    data 
+                }, null, 2);
+            } catch (err) {
+                result.textContent = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
