@@ -8,12 +8,12 @@ namespace TaskManager.Application.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectsRepository _projectsRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IProjectsMemberRepository _projectMemberRepo;
 
-        public ProjectService(IProjectsRepository projectsRepo, IUserRepository userRepo)
+        public ProjectService(IProjectsRepository projectsRepo, IProjectsMemberRepository projectMemberRepo)
         {
             _projectsRepo = projectsRepo;
-            _userRepo = userRepo;
+            _projectMemberRepo = projectMemberRepo;
         }
 
         public async Task<ProjectResponseDto> CreateProjectAsync(CreateProjectDto dto, Guid UserId)
@@ -28,6 +28,15 @@ namespace TaskManager.Application.Services
             };
 
             var createdProject = await _projectsRepo.CreateProjectAsync(project);
+
+            var createdMember = await _projectMemberRepo.CreateProjectAsync(new ProjectMembers
+            {
+                ProjectId = createdProject.Id,
+                UserId = UserId,
+                Role = ProjectMemberRole.Owner,
+                JoinedAt = DateTime.UtcNow
+            });
+
             return new ProjectResponseDto
             {
                 Id = createdProject.Id,
@@ -54,6 +63,27 @@ namespace TaskManager.Application.Services
                 CreatedAt = project.CreatedAt,
                 UpdatedAt = project.UpdatedAt
             };
+        }
+
+        public async Task<Pagination<ProjectResponseDto>> ListProjectByIdAsync(Guid userId, int page = 1, int pageSize = 10)
+        {
+            var projects = await _projectsRepo.ListProjectByIdAsync(userId, page, pageSize);
+            var totalItems = await _projectsRepo.CountProjectsByUserIdAsync(userId);
+            if (!projects.Any())
+                return new Pagination<ProjectResponseDto>(new List<ProjectResponseDto>(), 0, 0, page, pageSize);
+
+            var projectDtos = projects.Select(p => new ProjectResponseDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt
+            }).ToList();
+
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            return new Pagination<ProjectResponseDto>(projectDtos, totalItems, totalPages, page, pageSize);
         }
 
         public async Task<ProjectResponseDto> UpdateProjectByIdAsync(UpdateProjectDto dto)

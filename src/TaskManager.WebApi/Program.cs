@@ -42,6 +42,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IProjectsRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectsMemberRepository, ProjectMember>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();

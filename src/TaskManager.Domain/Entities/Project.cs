@@ -15,10 +15,11 @@ namespace TaskManager.Domain.Entities
         public DateTime UpdatedAt { get; set; }
 
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
-        public ICollection<ProjectMember> Members { get; set; } = new List<ProjectMember>();
+        public ICollection<ProjectMembers> Members { get; set; } = new List<ProjectMembers>();
     }
 
-    public class ProjectMember
+    [Table("ProjectMember")]
+    public class ProjectMembers
     {
         public Guid ProjectId { get; set; }
         public Project? Project { get; set; }

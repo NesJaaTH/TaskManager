@@ -9,7 +9,7 @@
         public DateTime CreatedAt { get; set; }
 
         public ICollection<Project> OwnedProjects { get; set; } = new List<Project>();
-        public ICollection<ProjectMember> ProjectsMember { get; set; } = new List<ProjectMember>();
+        public ICollection<ProjectMembers> ProjectsMember { get; set; } = new List<ProjectMembers>();
         public ICollection<TaskItem> AssignedTasks { get; set; } = new List<TaskItem>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }

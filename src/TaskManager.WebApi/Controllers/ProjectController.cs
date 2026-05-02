@@ -72,5 +72,54 @@ namespace TaskManager.WebApi.Controllers
             }
 
         }
+
+        [Authorize]
+        [HttpGet("list")]
+        public async Task<IActionResult> GetListProject()
+        {
+            var correlationId = HttpContext.GetCorrelationId();
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            try
+            {
+                _logger.LogInformation(
+                    "List project request started: {UserId} {CorrelationId}",
+                    userId,
+                    correlationId);
+                var result = await _projectService.ListProjectByIdAsync(Guid.Parse(userId!), 1, 10);
+                _logger.LogInformation(
+                    "List project request succeeded: {UserId} {CorrelationId} - {ProjectCount} projects",
+                    userId,
+                    correlationId,
+                    result.Items.Count);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(
+                    "List project request failed (bad request): {UserId} {CorrelationId} - {Message}",
+                    userId,
+                    correlationId,
+                    ex.Message);
+                return BadRequest(new
+                {
+                    error = ex.Message,
+                    correlationId
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(
+                    "List project request failed (server error): {UserId} {CorrelationId} - {Message}",
+                    userId,
+                    correlationId,
+                    ex.Message);
+                return StatusCode(500, new
+                {
+                    error = "An unexpected error occurred while retrieving the project list.",
+                    correlationId
+                });
+            }
+        }
     }
 }

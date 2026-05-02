@@ -7,6 +7,8 @@ namespace TaskManager.Domain.Ports
         Task<Project> CreateProjectAsync(Project project);
         Task<Project?> FindProjectByIdAsync(Guid id);
         Task<string?> DeletedProjectsByUserIdAsync(Guid id);
+        Task<int> CountProjectsByUserIdAsync(Guid userid);
+        Task<List<Project>> ListProjectByIdAsync(Guid userid,int page, int pageSize);
         Task<Project> UpdateProjectsByUserIdAsync(Project project);
     }
 }

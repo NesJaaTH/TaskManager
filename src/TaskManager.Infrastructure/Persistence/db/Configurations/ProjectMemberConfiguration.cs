@@ -4,9 +4,9 @@ using TaskManager.Domain.Entities;
 
 namespace TaskManager.Infrastructure.Persistence.db.Configurations
 {
-    public class ProjectMemberConfiguration : IEntityTypeConfiguration<ProjectMember>
+    public class ProjectMemberConfiguration : IEntityTypeConfiguration<ProjectMembers>
     {
-        public void Configure(EntityTypeBuilder<ProjectMember> e) 
+        public void Configure(EntityTypeBuilder<ProjectMembers> e) 
         {
             e.HasKey(pm => new { pm.ProjectId, pm.UserId });
             e.HasOne(pm => pm.Project)

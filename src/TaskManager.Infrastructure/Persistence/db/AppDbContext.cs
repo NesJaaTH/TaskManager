@@ -9,6 +9,7 @@ namespace TaskManager.Infrastructure.Persistence
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Project> Projects => Set<Project>();
+        public DbSet<ProjectMembers> ProjectsMember => Set<ProjectMembers>();
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
         public DbSet<Comment> Comments => Set<Comment>();
 
