@@ -12,7 +12,10 @@ using TaskManager.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opt => {
+        opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -21,6 +24,7 @@ builder.Services.AddHealthChecks();
 
 // CORS
 var corsOrigins = builder.Configuration["CORS_ORIGINS"]?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? ["*"];
+
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("AllowConfigured", policy =>
@@ -30,7 +34,9 @@ builder.Services.AddCors(opt =>
         else
             policy.WithOrigins(corsOrigins);
 
-        policy.WithMethods("GET", "POST", "PUT", "DELETE");
+        policy.WithMethods("GET", "POST", "PUT", "DELETE")
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -43,11 +49,13 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IProjectsRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectsMemberRepository, ProjectMember>();
+builder.Services.AddScoped<ITaskItemsRepository, TaskItemsRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ITaskItemsService, TaskItemsService>();
 
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -68,6 +76,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    Console.WriteLine($"🌐 CORS Config:");
+    foreach (var origin in corsOrigins)
+    {
+        Console.WriteLine($"   - {origin}");
+    }
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }

@@ -4,9 +4,9 @@ using TaskManager.Domain.Entities;
 
 namespace TaskManager.Infrastructure.Persistence.Configurations
 {
-    public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
+    public class TaskItemsConfiguration : IEntityTypeConfiguration<TaskItems>
     {
-        public void Configure(EntityTypeBuilder<TaskItem> e)
+        public void Configure(EntityTypeBuilder<TaskItems> e)
         {
             e.HasKey(t => t.Id);
             e.Property(t => t.Id).HasDefaultValueSql("gen_random_uuid()");

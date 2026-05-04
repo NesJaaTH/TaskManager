@@ -1,6 +1,9 @@
-﻿namespace TaskManager.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TaskManager.Domain.Entities
 {
-    public class TaskItem
+    [Table(name: "TaskItem")]
+    public class TaskItems
     {
         public Guid Id { get; set; }
         public Guid ProjectId { get; set; }
@@ -9,8 +12,8 @@
         public User? Assignee { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public TaskItemStatus Status { get; set; } = TaskItemStatus.ToDo;
-        public TaskItemPriority Priority { get; set; } = TaskItemPriority.Low;
+        public TaskItemsStatus Status { get; set; } = TaskItemsStatus.ToDo;
+        public TaskItemsPriority Priority { get; set; } = TaskItemsPriority.Low;
         public DateTime? DueDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
@@ -18,7 +21,7 @@
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 
-    public enum TaskItemStatus
+    public enum TaskItemsStatus
     {
         ToDo,
         InProgress,
@@ -26,7 +29,7 @@
         Canceled
     }
 
-    public enum TaskItemPriority
+    public enum TaskItemsPriority
     {
         Low,
         Medium,

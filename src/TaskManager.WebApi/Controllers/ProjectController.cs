@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TaskManager.Application.DTOs;
 using TaskManager.Application.Interfaces;
+using TaskManager.Domain.Entities;
 using TaskManager.WebApi.Middleware;
 
 namespace TaskManager.WebApi.Controllers
@@ -117,6 +118,54 @@ namespace TaskManager.WebApi.Controllers
                 return StatusCode(500, new
                 {
                     error = "An unexpected error occurred while retrieving the project list.",
+                    correlationId
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("{projectId}")]
+        public async Task<IActionResult> GetProjectById(Guid projectId)
+        {
+            var correlationId = HttpContext.GetCorrelationId();
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            try
+            {
+                _logger.LogInformation(
+                    "Get project by ID request started: {UserId} {CorrelationId}",
+                    userId,
+                    correlationId);
+                var result = await _projectService.FindProjectByIdAsync(projectId, Guid.Parse(userId!));
+                _logger.LogInformation(
+                    "Get project request succeeded: {ProjectName} {UserId} {CorrelationId}",
+                    result.Name,
+                    userId,
+                    correlationId);
+                return Ok(result); // Return the project details
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(
+                    "Get project by ID request failed (bad request): {UserId} {CorrelationId} - {Message}",
+                    userId,
+                    correlationId,
+                    ex.Message);
+                return BadRequest(new
+                {
+                    error = ex.Message,
+                    correlationId
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(
+                    "Get project by ID request failed (server error): {UserId} {CorrelationId} - {Message}",
+                    userId,
+                    correlationId,
+                    ex.Message);
+                return StatusCode(500, new
+                {
+                    error = "An unexpected error occurred while retrieving the project details.",
                     correlationId
                 });
             }

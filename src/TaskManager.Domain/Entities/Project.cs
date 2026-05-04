@@ -14,7 +14,7 @@ namespace TaskManager.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
+        public ICollection<TaskItems> Tasks { get; set; } = new List<TaskItems>();
         public ICollection<ProjectMembers> Members { get; set; } = new List<ProjectMembers>();
     }
 
