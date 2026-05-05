@@ -44,5 +44,53 @@ namespace TaskManager.Application.Services
                 UpdatedAt = createdTaskItems.UpdatedAt
             };
         }
+
+        public async Task<List<ResponseTaskItemsDto>> ListTaskByProjectIdAsync(Guid projectId)
+        {
+            var taskItemsList = await _taskItemsRepo.ListTaskByProjectIdAsync(projectId);
+            return taskItemsList.Select(task => new ResponseTaskItemsDto
+            {
+                Id = task.Id,
+                AssigneeId = task.AssigneeId,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = task.DueDate,
+                CreatedAt = task.CreatedAt,
+                UpdatedAt = task.UpdatedAt
+            }).ToList();
+        }
+
+        public async Task<ResponseTaskItemsDto> UpdateTaskItemsByIdAsync(UpdateTaskItemsDto dto, Guid taskItemId)
+        {
+            var existingTaskItem = await _taskItemsRepo.FindTaskByIdAsync(taskItemId);
+            if (existingTaskItem == null)
+            {
+                throw new ArgumentException("Task item not found.");
+            }
+            existingTaskItem.Title = dto.Title ?? existingTaskItem.Title;
+            existingTaskItem.Description = dto.Description ?? existingTaskItem.Description;
+            existingTaskItem.Status = dto.Status ?? existingTaskItem.Status;
+            existingTaskItem.Priority = dto.Priority ?? existingTaskItem.Priority;
+            existingTaskItem.DueDate = dto.DueDate ?? existingTaskItem.DueDate;
+            existingTaskItem.UpdatedAt = DateTime.UtcNow;
+            var updatedTaskItem = await _taskItemsRepo.UpdateTaskByIdAsync(existingTaskItem);
+            return new ResponseTaskItemsDto
+            {
+                Id = updatedTaskItem.Id
+            };
+        }
+
+        public async Task<string?> DeletedTaskByIdAsync(Guid taskItemId)
+        {
+            var existingTaskItem = await _taskItemsRepo.FindTaskByIdAsync(taskItemId);
+            if (existingTaskItem == null)
+            {
+                throw new ArgumentException("Task item not found.");
+            }
+            await _taskItemsRepo.DeletedTaskByIdAsync(taskItemId);
+            return $"Task item with ID {taskItemId} has been deleted.";
+        }
     }
 }
